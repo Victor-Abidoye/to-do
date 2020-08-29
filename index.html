@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>Todo</title>
+
+     <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <style>
+        body {
+            background: linear-gradient(to top right,rgba(12, 12, 12, 0.5),rgba(2, 2, 2, 0.7)),  url(img/todo.jpeg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        #a {
+            height: 90vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row mt-5" id="a">
+            <div class="col-sm-12 col-lg-6" id="x" >
+                <div class="table-responsive">
+                    <table class="table table-striped text-center">
+                        <thead class="thead-dark text-white">
+                            <tr>
+                                <th>S/N</th>
+                                <th>EVENT</th>
+                                <th>TIME</th>
+                                <th class="text-danger">CANCEL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body" class="text-white">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-6" >
+                <div class="card">
+                    <div class="card card-header bg-primary text-white ">
+                        <h3 class="mr-auto ml-auto">TO-DO INPUT</h3>
+                    </div>
+                    <div class="card-body">
+                        <dt class="float-left mr-4">Event:</dt>
+                        <dl><textarea name="todo" id="event" cols="40" rows="5" class="form-control"></textarea></dl>
+                        <dt class="float-left mr-4">Time: </dt>
+                        <dl><input type="time" id="time" class="form-control"></dl>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-primary btn-block" onclick="add()">ADD</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+
+    <script>
+        // Initianlize an array to store ojects of properties event('e') and time('t')
+        var todo_array = []
+
+        // Onclick on the add button
+        // Function adds gets the value of the event and time and creates an object
+        // The new object is pushed into the todo_array
+        function add(){
+            var new_event = document.getElementById('event').value
+            var new_time = document.getElementById('time').value
+            if (new_event != "" && new_time != "") {
+                var obj = {e: new_event, t: new_time}
+                todo_array.push(obj)
+                localStores()
+            }
+        }
+
+        // Stores the updated todo_array in the localStorage with ket "store"
+        function localStores() {
+            localStorage.setItem('store', JSON.stringify(todo_array))
+            displays()
+             show()
+        }
+
+        // The display array goes into the localStorage and gets the "store" value
+        // for each object in the array, a new tr element is created
+        // This table row is filled with td That then displats the S/N, event, time, and a remove button
+        function displays() {
+            var z = JSON.parse( localStorage.getItem("store"))
+            body.innerHTML = ""
+            for(i = 0; i < todo_array.length; i++) {
+                var s = i + 1
+                var ev = z[i]['e']
+                var ti = z[i]['t']
+
+                var tr = document.createElement("tr")
+                var td1 = document.createElement("td")
+                var td2 = document.createElement("td")
+                var td3 = document.createElement("td")
+                var td4 = document.createElement("td")
+                var b1 = document.createElement("button")
+
+                var td1_node = document.createTextNode(s)
+                var td2_node = document.createTextNode(ev)
+                var td3_node = document.createTextNode(ti)
+                var b1_node = document.createTextNode("remove")
+
+                td1.appendChild(td1_node)
+                td2.appendChild(td2_node)
+                td3.appendChild(td3_node)
+                b1.appendChild(b1_node)
+
+                b1.setAttribute("value", s.toString())
+                b1.classList.add("btn", "btn-danger", "btn-sm")
+                b1.setAttribute("id", s.toString())
+                b1.setAttribute("onclick", "removes(" + s + ")")
+
+                td4.appendChild(b1)
+                tr.appendChild(td1)
+                tr.appendChild(td2)
+                tr.appendChild(td3)
+                tr.appendChild(td4)
+
+                element = document.getElementById('body')
+                element.appendChild(tr)
+            }
+
+        }
+
+        // On click any remove button in the table, removes function make a copy of the todo_array stored int the localStorage
+        // The copy of the array is edited and the tr affected is removed
+        // the new array is sent back to the local_storage and the display() is called again
+        function removes(x) {
+            var t = JSON.parse( localStorage.getItem('store'))
+            t.splice(x-1, 1)
+            localStorage.setItem('store', JSON.stringify(t))
+            todo_array = t
+            displays()
+            show()
+        }
+
+        // On opening the window, the localStorage is loaded into the the empty todo_array
+        // The display fuction is then called
+        function onOpen() {
+            var m = JSON.parse(localStorage.getItem("store"))
+            if (m != null) {
+                todo_array = m
+                displays()
+                 show()
+            }
+        }
+
+        // The show function displays displays a table if the todo_array has any object
+        // If it doesn't the table is hidden
+        function show() {
+            var m = JSON.parse(localStorage.getItem("store"))
+            if (m != null) {
+                if (m.length == 0) {
+                    x.hidden = true
+
+                } else {
+                    x.hidden = false
+                }
+            } else {
+                x.hidden = true
+            }
+        }
+
+        // On loding the page, call these functions
+        onOpen()
+        show()
+
+
+    </script>
+</body>
+</html>
